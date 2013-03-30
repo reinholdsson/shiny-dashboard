@@ -30,48 +30,45 @@ shinyUI(bootstrapPage(
     ),
 
     div(class="row",
+
+        # Left panel
         div(class="span3",
-            # Startdatum
-            m_title("startdatum"),
-            uiOutput("startyear"),
-            uiOutput("startmonth"),
-            m_desc("startdatum"),
             
-            # Slutdatum
-            m_title("slutdatum"),
-            uiOutput("endyear"),
-            uiOutput("endmonth"),
-            m_desc("startdatum")
+            # Mått
+            h3("Mått"),
+            helpText("Välj lämpligt mått"),
+            selectInput("measure", label = "", choices = c(
+                "Antal ärenden" = 1, "Handläggningstid" = 2)),
+            
+            # Process
+            m_title("process"),
+            m_desc("process"),
+            cond_ui("measure", "process"),
+            
+            # Ärendetyp
+            m_title("arendetyp"),
+            m_desc("arendetyp"),
+            cond_ui("process", "arendetyp")
+            
         ),
         
-        div(class="span10", 
+        # Main panel
+        div(class="span8", 
             div(class="row",
-                div(class="span3",
-                    h3("Mått"),
-                    selectInput("measure", label = "", choices = c(
-                        "Antal ärenden" = 1, "Handläggningstid" = 2)),
-                    helpText("Välj lämpligt mått")
-                    
-                ),
-                div(class="span3",
-                    m_title("process"),
-                    cond_ui("measure", "process"),
-                    m_desc("process")
-                ),
-                div(class="span3",
-                    m_title("arendetyp"),
-                    cond_ui("process", "arendetyp"),
-                    m_desc("arendetyp")
-                ),
-    
-                div(class="row",
-                    conditionalPanel(
-                        condition = "input.measure == 1",
-                        htmlOutput("frequency_chart")
-                    ),
-                    htmlOutput("us")
-                )
-            )
+                # Startdatum
+                div(class="span1", uiOutput("startyear")),
+                div(class="span3", uiOutput("startmonth")),
+                
+                # Slutdatum
+                div(class="span1", uiOutput("endyear")),
+                div(class="span3", uiOutput("endmonth"))
+            ),
+            conditionalPanel(
+                condition = "input.measure == 1",
+                htmlOutput("frequency_chart")
+            ),
+            htmlOutput("us")
         )
     )
+    
 ))

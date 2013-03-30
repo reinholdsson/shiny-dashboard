@@ -33,13 +33,14 @@ a["processtyp"] <- doc(title = "Processtyp", description = "Information om var d
 
 a["arendetyp"] <- sample(
     c(
+        NA,
         "Ansökan",
         "Omräkning",
         "Allmän",
         "Övrigt"
     ),
     1000000, replace = TRUE,
-    prob = c(5,3,2,0.2))
+    prob = c(0.1,5,3,2,0.2))
 a["arendetyp"] <- doc(title = "Ärendetyp", description = "Typ av ärende")
 
 a["klassificering"] <- sample(

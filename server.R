@@ -14,41 +14,69 @@
 shinyServer(function(input, output) {
     
     # Reactive dataset
-    data <- reactive({
-        .data[
+    pre_data <- reactive({
+        
+        # Ta hand om NA värden för slutdatum!
+        if (TRUE) {
+            endyear <- c(input$endyear, NA)
+            endmonth <- c(input$endmonth, NA)
+        } else {
+            endyear <- input$endyear
+            endmonth <- input$endmonth
+        }
+        
+        data <- .data[
             process %in% input$process
             & year(startdatum) %in% input$startyear
             & month(startdatum) %in% input$startmonth
-            & year(slutdatum) %in% input$endyear
-            & month(slutdatum) %in% input$endmonth
+            & year(slutdatum) %in% endyear
+            & month(slutdatum) %in% endmonth
             ]
+        
+    })
+    
+    data <- reactive({
+        
+        types <- input$arendetyp
+        types[types == ""] <- NA  # fix för att få med NA-värden
+        
+        pre_data()[arendetyp %in% types]
     })
     
     output$process <- renderUI({
-        processes <- unique(.data$process)
+        processes <- sort(unique(.data$process), na.last = TRUE)
         selectInput("process", label = "", choices = processes, selected = processes[1], multiple = TRUE)
     })
     
     output$arendetyp <- renderUI({
-        selectInput("arendetyp", label = "", choices = unique(data()$arendetyp), multiple = TRUE)
+        types <- sort(unique(pre_data()$arendetyp), na.last = TRUE)
+        selectInput("arendetyp", label = "", choices = types, selected = types, multiple = TRUE)
     })
     
     output$startyear <- renderUI({
         years <- year(min(.data$startdatum, na.rm = TRUE)):year(max(.data$startdatum, na.rm = TRUE))
-        selectInput("startyear", label = "", choices = years, selected = years[length(years)], multiple = TRUE)
+        checkboxGroupInput("startyear", label = "Startår:", choices = years, selected = years[length(years)])
     })
     
     output$startmonth <- renderUI({
-        selectInput("startmonth", label = "", choices = .months, selected = names(.months), multiple = TRUE)
+        selectInput("startmonth", label = "Startmånad:", choices = .months, selected = names(.months), multiple = TRUE)
+    })
+    
+    output$startmissing <- renderUI({
+        checkboxInput("startmissing", label = "Include NA", value = TRUE)
     })
     
     output$endyear <- renderUI({
         years <- year(min(.data$slutdatum, na.rm = TRUE)):year(max(.data$slutdatum, na.rm = TRUE))
-        selectInput("endyear", label = "", choices = years, selected = years[length(years)], multiple = TRUE)
+        checkboxGroupInput("endyear", label = "Slutår:", choices = years, selected = years[length(years)])
     })
     
     output$endmonth <- renderUI({
-        selectInput("endmonth", label = "", choices = .months, selected = names(.months), multiple = TRUE)
+        selectInput("endmonth", label = "Slutmånad:", choices = .months, selected = names(.months), multiple = TRUE)
+    })
+    
+    output$endmissing <- renderUI({
+        checkboxInput("endmissing", label = "Include NA", value = TRUE)
     })
     
     frequency_table <- reactive({
