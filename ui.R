@@ -67,7 +67,7 @@ shinyUI(bootstrapPage(
                 condition = "input.measure == 1",
                 htmlOutput("frequency_chart")
             ),
-            htmlOutput("us")
+            htmlOutput("time_chart")
         )
     )
     

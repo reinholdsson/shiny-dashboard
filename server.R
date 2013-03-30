@@ -13,6 +13,8 @@
 # Server application
 shinyServer(function(input, output) {
     
+    ### DATA PROCESSING ###
+
     # Reactive dataset
     pre_data <- reactive({
         
@@ -42,6 +44,53 @@ shinyServer(function(input, output) {
         
         pre_data()[arendetyp %in% types]
     })
+    
+    time_table <- reactive({
+        
+        # Ladda data
+        data <- data()
+        
+        # Beräkna handläggningstid per ärende
+        data[ , hltid := as.Date(slutdatum) - as.Date(startdatum)]
+        
+        # Beräkna medel handläggningstid per år och månad
+        data <- data[!is.na(slutdatum)][, mean(hltid, na.rm = TRUE), by = list(year(slutdatum), month(slutdatum))]
+        
+        data[, ym := paste(year, month, sep = "")]
+        
+        return(data)
+    })
+    
+    frequency_table <- reactive({
+        
+        # Bearbetning av data
+        data <- data()
+        
+        # Beräkna frekvenser
+        freq <- merge(
+            
+            # Beräkna antalet startade ärenden per år och månad
+            data[ , .N, by = list(year(startdatum), month(startdatum))], 
+            
+            # Beräkna antalet avslutade ärenden per år och månad
+            data[!is.na(slutdatum)][ , .N, by = list(year(slutdatum), month(slutdatum))],  # exkludera pågående ärenden
+            
+            by = c("year", "month"), 
+            suffixes = c(".started", ".ended"), 
+            all = TRUE
+        )
+        
+        # Beräkna nettoförändring
+        freq[ , N.change := sum(N.started, -N.ended, na.rm = TRUE), by=1:NROW(freq)]
+        
+        # Beräkna antalet pågående ärenden per år och månad
+        freq[ , N.ongoing := cumsum(N.change)]
+        
+        freq[, ym := paste(year, month, sep = "")]
+    })
+    
+    
+    ### UI ###
     
     output$process <- renderUI({
         processes <- sort(unique(.data$process), na.last = TRUE)
@@ -79,48 +128,38 @@ shinyServer(function(input, output) {
         checkboxInput("endmissing", label = "Include NA", value = TRUE)
     })
     
-    frequency_table <- reactive({
-        
-        # Bearbetning av data
-        data <- data()
-        
-        # Beräkna frekvenser
-        freq <- merge(
-            
-            # Beräkna antalet startade ärenden per år och månad
-            data[ , .N, by = list(year(startdatum), month(startdatum))], 
-            
-            # Beräkna antalet avslutade ärenden per år och månad
-            data[!is.na(slutdatum)][ , .N, by = list(year(slutdatum), month(slutdatum))],  # exkludera pågående ärenden
-            
-            by = c("year", "month"), 
-            suffixes = c(".started", ".ended"), 
-            all = TRUE
-        )
-        
-        # Beräkna nettoförändring
-        freq[ , N.change := sum(N.started, -N.ended, na.rm = TRUE), by=1:NROW(freq)]
-        
-        # Beräkna antalet pågående ärenden per år och månad
-        freq[ , N.ongoing := cumsum(N.change)]
-        
-        freq[, ym := paste(year, month, sep = "")]
-    })
-
+    
+    ### CHARTS ###
+    
     output$frequency_chart <- renderChart({
         
-        freq <- frequency_table()
+        data <- frequency_table()
 
         # Skapa graf
         a <- rHighcharts:::Chart$new()
         a$title(text = "In- och utflöde")
-        a$xAxis(categories = freq$ym, tickInterval = 6)
+        a$xAxis(categories = data$ym, tickInterval = 6)
         a$yAxis(title = list(text = "Antal ärenden"))
         
-        a$data(x = freq$ym, y = freq$N.ongoing, type = "column", name = "Pågående")
-        a$data(x = freq$ym, y = freq$N.started, type = "line", name = "Inkomna")
-        a$data(x = freq$ym, y = freq$N.ended, type = "line", name = "Avslutade")
-        a$data(x = freq$ym, y = freq$N.change, type = "column", name = "+/-")
+        a$data(x = data$ym, y = data$N.ongoing, type = "column", name = "Pågående")
+        a$data(x = data$ym, y = data$N.started, type = "line", name = "Inkomna")
+        a$data(x = data$ym, y = data$N.ended, type = "line", name = "Avslutade")
+        a$data(x = data$ym, y = data$N.change, type = "column", name = "+/-")
+        
+        return(a)
+    })
+    
+    output$time_chart <- renderChart({
+        
+        data <- time_table()
+        
+        # Skapa graf
+        a <- rHighcharts:::Chart$new()
+        a$title(text = "Handläggningstid")
+        a$xAxis(categories = data$ym, tickInterval = 6)
+        a$yAxis(title = list(text = "Dagar"))
+        
+        a$data(x = data$ym, y = data$V1, type = "column", name = "Handläggningstid")
         
         return(a)
     })
