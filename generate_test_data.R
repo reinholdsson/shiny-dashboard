@@ -1,91 +1,62 @@
-require(markdown)
-require(data.table)
-require(ggplot2)
-require(ggthemes)
-require(googleVis)
+# Produktionsstatistik testdata
 
-shinyServer(function(input, output) {
-    
-    variable <- reactive({
+library(Coldbir)
 
-        if(is.null(input$dims)) {
-            i <- 1
-        } else {
-            i <- as.integer(input$dims)
-        }
-        
-        sel <- d[[input$variable]][[i]]
-        
-        db[input$variable, sel]
-    })
-    
-    output$dims <- renderUI({
-        
-        # If missing input, return to avoid error later in function
-        if(is.null(input$variable))
-            return()
-        
-        # Get available dims
-        dims <- get_dims(db, input$variable)
-        
-        # Prepare choices (index number)
-        index <- 1:length(dims)
-        names(index) <- sapply(dims, function(x) { paste(x, collapse = "/") })
-        names(index)[names(index) == ""] <- "None"
+a <- cdb("~/Desktop/prodstat")
 
-        radioButtons("dims", label = "Dimensions", choices = index)
-    })
-    
-    output$table <- renderGvis({
-        x <- variable()
-        
-        if (is.factor(x)) {
-            x <- summary(x)
-            x <- data.frame("Variable" = names(x), "N" = x)
-        } else {
-            stats <- c(
-                "N" = length(x),
-                "Min" = min(x, na.rm = TRUE), 
-                "Median" = median(x, na.rm = TRUE), 
-                "Mean" = mean(x, na.rm = TRUE), 
-                "Max" = max(x, na.rm = TRUE),
-                "Sd" = sd(x, na.rm = TRUE),
-                "NA's" = length(x[is.na(x)])
-            )
-            x <- data.frame("Measure" = names(stats), "Value" = stats)
-        }
-        gvisTable(x, options = list(width = "100%", page = "enable", height = "300px"))
-    })
-    
-    output$charts <- renderPlot({
+a["arendeid"] <- 1:1000000
+a["arendeid"] <- doc(title = "Ärende Id", description = "Ärende identifieringsid")
 
-        x <- variable()
+a["process"] <- sample(
+    c(
+        "Bostadstillägg och äldreförsörjningsstöd",
+        "Premiepension",
+        "Efterlevandepension",
+        "Ålderspension",
+        "Kravärende",
+        "Ärendemottagning"
+    ),
+    1000000, replace = TRUE,
+    prob = c(3,5,1,2,0.4,0.7))
+a["process"] <- doc(title = "Process", description = "Process som ärendet tillhör")
 
-        if (is.factor(x)) {
-            x <- table(x)
-            x <- as.data.frame(x)
-            #x <- x[with(x, order(-Freq)), ]
-            #x <- head(x, 10)
-            
-            #p <- ggplot(x) + geom_point(aes(x = reorder(x, Freq), y = Freq)) + labs(title = "Frequency")
-            p <- ggplot(x) + geom_point(aes(x = x, y = Freq)) + labs(title = "Frequency")
-        } else {
-            
-            # Sample for large vectors
-            if (length(x) > 100000) {
-                x <- sample(x, 100000)
-            }
-            
-            x <- data.table(x = x)
-            p <- ggplot(x) + geom_density(aes(x = x), fill = "lightblue") + labs(title = "Density")
-        }
+a["processtyp"] <- sample(
+    c(
+        NA,
+        "Nationellt",
+        "Internationellt",
+        "Utland"
+    ),
+    1000000, replace = TRUE,
+    prob = c(5,2,2,1))
+a["processtyp"] <- doc(title = "Processtyp", description = "Information om var den sökande är eller har varit bosatt")
 
-        p <- p + xlab(NULL) + ylab(NULL) + theme_tufte() + theme(legend.position="none")
-        print(p)
-    })
-    
-    output$docs <- renderText({
-        markdown::markdownToHTML(text = list_to_md(get_doc(db, input$variable)), fragment.only = TRUE)
-    })
+a["arendetyp"] <- sample(
+    c(
+        "Ansökan",
+        "Omräkning",
+        "Allmän",
+        "Övrigt"
+    ),
+    1000000, replace = TRUE,
+    prob = c(5,3,2,0.2))
+a["arendetyp"] <- doc(title = "Ärendetyp", description = "Typ av ärende")
 
-})
+a["klassificering"] <- sample(
+    c(
+        "GARP",
+        "Felberäkning",
+        "Övrigt",
+        "Testärende",
+        "Omgående"
+    ),
+    1000000, replace = TRUE,
+    prob = c(1,0.1,1,2,0.5))
+a["klassificering"] <- doc(title = "Klassificering", description = "Klassificering av ärende (avser)")
+
+a["startdatum"] <- as.POSIXct(runif(1000000, 0, 100000000), origin = '2010-06-01')
+a["startdatum"] <- doc(title = "Startdatum", description = "När ärendet startades")
+
+a["slutdatum"] <- as.POSIXct(a["startdatum"] + c(runif(900000, 0, 10000000), rep(NA, 100000)), origin = '2010-06-01')  # Lägg 10 % NA-värden för ärenden som inte avslutats
+a["slutdatum"] <- doc(title = "Slutdatum", description = "När ärendet avslutades")
+
