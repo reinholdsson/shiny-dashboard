@@ -1,9 +1,10 @@
 # Load libraries
 
+library(zoo)
+library(lubridate)
 library(Coldbir)
 library(rHighcharts)
 library(data.table)
-library(zoo)
 
 # Global variables
 
@@ -15,7 +16,6 @@ library(zoo)
 .data <- data.table(
     arendeid = .db["arendeid"],
     process = .db["process"],
-    processtyp = .db["processtyp"],
     arendetyp = .db["arendetyp"],
     klassificering = .db["klassificering"],
     startdatum = .db["startdatum"],

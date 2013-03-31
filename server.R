@@ -76,23 +76,68 @@ shinyServer(function(input, output) {
 
         # Beräkna handläggningstid för avslutade ärenden
         data[ , days := as.Date(slutdatum) - as.Date(startdatum)]
+
+        # Beräkna medel handläggningstid per år och månad  
+        data <- data[, list(sum(days, na.rm = TRUE), .N), by = list(year(slutdatum), month(slutdatum))]
+        data[ , mean := V1/N]
         
-        # Beräkna medel handläggningstid per år och månad
-        data <- data[, mean(days, na.rm = TRUE), by = list(year(slutdatum), month(slutdatum))]
         data <- data[order(year, month)]  # sortera
         
+        # Beräkna aggregerade summor
+        data[ , N_sum := cumsum(N)]
+        data[ , V1_sum := cumsum(as.integer(V1))]
+        data[ , mean_sum := V1_sum/N_sum]
+
+        # Beräkna handläggningstid för pågående ärenden (mer komplext!)
+        
+        ## Begränsa data till avslutade under året samt 
+        ongoing <- data()[is.na(slutdatum) | year(slutdatum) == input$year]
+        
+        ## Beräkna hltid för pågende ärenden per månad (för den sista dagen i respektive månad)
+        ### TODO: Nedan behöver dubbelkollas
+        ### (Denna är väldigt långsam!!)
+        ongoing_months <- 1:12
+        ongoing_times <- sapply(ongoing_months, function(m) {
+
+            # Ange vald månads sista dag
+            m_last_date <- as.Date(paste(input$year, m, days_in_month(m), sep = "-"))
+            
+            # Hämta ärenden som avslutats efter angiven månad, eller är NA
+            d <- ongoing[as.Date(startdatum) <= m_last_date & (month(slutdatum) > m | is.na(slutdatum))]
+
+            # Beräkna handläggningstid
+            d[ , days := m_last_date - as.Date(startdatum)]
+            d <- d[, mean(days, na.rm = TRUE)]
+            return(d)
+        })
+        
+        # Skapa dataset för respektive typ
+        ended <- data
+        ongoing <- data.table(
+            year = input$year,
+            month = ongoing_months,
+            V1 = ongoing_times)
+        
+        # Slå samman
+        times <- merge(
+            ended,
+            ongoing,
+            by = "month", all = TRUE, suffixes = c(".ended", ".ongoing"))
+            
         # Replace month with labels
-        data[ , month := .months[data$month]]
+        times$month <- .months[times$month]
 
         # Skapa graf
         a <- rHighcharts:::Chart$new()
         a$title(text = "Handläggningstid")
-        a$subtitle(text = "Avslutade ärenden")
-        a$xAxis(categories = data$month)
+        a$subtitle(text = "Pågående och avslutade ärenden")
+        a$xAxis(categories = times$month)
         a$yAxis(title = list(text = "Dagar"))
-        
-        a$data(x = data$month, y = data$V1, type = "column", name = "Handläggningstid")
-        
+
+        a$data(x = times$month, y = as.double(times$mean), type = "column", name = "Avslutade")
+        a$data(x = times$month, y = times$mean_sum, type = "line", name = "Avslutade (aggregerat)")
+        a$data(x = times$month, y = times$V1.ongoing, type = "line", name = "Pågående")
+
         return(a)
     })
     

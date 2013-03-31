@@ -14,10 +14,10 @@ shinyUI(bootstrapPage(
     
     # Header panel
     div(class="row",
-        div(class="span3",
+        div(class="span2",
             uiOutput("year")
         ),
-        div(class="span3",
+        div(class="span2",
             uiOutput("process")
         )
     ),
@@ -25,10 +25,10 @@ shinyUI(bootstrapPage(
     # Main panel
     h3(textOutput("title")),
     div(class="row",
-        div(class="span6",
+        div(class="span7",
             uiOutput("flow")
         ),
-        div(class="span6",
+        div(class="span7",
             uiOutput("days")
         )
     )
