@@ -1,0 +1,6 @@
+key	value
+1	Ansökan
+2	Omprövning
+3	Omräkning
+4	Utbetalning
+5	Övrigt

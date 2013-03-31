@@ -9,15 +9,13 @@ library(data.table)
 # Global variables
 
 ## Data source
-.data_source <- "~/Desktop/prodstat/"
-.db <- cdb(.data_source, type = "f")
+.db <- cdb("data", type = "f")
 
 ## Load data into memory
 .data <- data.table(
     arendeid = .db["arendeid"],
     process = .db["process"],
     arendetyp = .db["arendetyp"],
-    klassificering = .db["klassificering"],
     startdatum = .db["startdatum"],
     slutdatum = .db["slutdatum"]
 )

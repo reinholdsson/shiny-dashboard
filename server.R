@@ -3,7 +3,7 @@ shinyServer(function(input, output) {
     
     # Reactive text
     output$title <- renderText({
-        paste(input$process, input$year)
+        paste(input$process, input$year, sep = ", ")
     })
     
     # UI controls    
