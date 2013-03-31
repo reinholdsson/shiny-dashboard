@@ -11,5 +11,17 @@ library(zoo)
 .data_source <- "~/Desktop/prodstat/"
 .db <- cdb(.data_source, type = "f")
 
-## Months
-.months <- c("Januari" = 1, "Februari" = 2, "Mars" = 3, "April" = 4, "Maj" = 5, "Juni" = 6, "Juli" = 7, "Augusti" = 8, "September" = 9, "Oktober" = 10, "November" = 11, "December" = 12)
+## Load data into memory
+.data <- data.table(
+    arendeid = .db["arendeid"],
+    process = .db["process"],
+    processtyp = .db["processtyp"],
+    arendetyp = .db["arendetyp"],
+    klassificering = .db["klassificering"],
+    startdatum = .db["startdatum"],
+    slutdatum = .db["slutdatum"]
+)
+
+## Constants
+#.months <- c("Januari", "Februari", "Mars", "April", "Maj", "Juni", "Juli", "Augusti", "September", "Oktober", "November", "December")
+.months <- c("Jan", "Feb", "Mar", "Apr", "Maj", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec")
