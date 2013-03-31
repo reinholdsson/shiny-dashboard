@@ -57,12 +57,12 @@ shinyServer(function(input, output) {
         a$yAxis(title = list(text = "Antal ärenden"))
         
         a$data(x = data$month, y = data$N.ongoing, type = "column", name = "Pågående")
-        a$data(x = data$month, y = data$N.started, type = "line", name = "Inkomna")
+        a$data(x = data$month, y = data$N.started, type = "column", name = "Inkomna")
+        a$data(x = data$month, y = data$N.ended, type = "column", name = "Avslutade")
+        a$data(x = data$month, y = data$N.change, type = "line", name = "+/-")
         a$data(x = data$month, y = data$N.started_sum, type = "line", name = "Inkomna (aggregerat)")
-        a$data(x = data$month, y = data$N.ended, type = "line", name = "Avslutade")
         a$data(x = data$month, y = data$N.ended_sum, type = "line", name = "Avslutade (aggregerat)")
-        a$data(x = data$month, y = data$N.change, type = "column", name = "+/-")
-        
+
         return(a)
     })
     
@@ -138,6 +138,20 @@ shinyServer(function(input, output) {
         a$data(x = times$month, y = times$mean_sum, type = "line", name = "Avslutade (aggregerat)")
         a$data(x = times$month, y = times$V1.ongoing, type = "line", name = "Pågående")
 
+        return(a)
+    })
+    
+    output$types <- renderChart({
+        
+        data <- data()[year(slutdatum) == input$year]
+        data <- data[ , .N, by = arendetyp]
+        data <- data[order(N, decreasing = TRUE)]
+        
+        # Skapa graf
+        a <- rHighcharts:::Chart$new()
+        a$title(text = "Ärendetyp")
+        a$subtitle(text = "Avslutade ärenden")
+        a$data(x = data$arendetyp, y = data$N, type = "pie", name = "Antal", size = 150)
         return(a)
     })
     

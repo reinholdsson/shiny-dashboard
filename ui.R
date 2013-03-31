@@ -31,6 +31,11 @@ shinyUI(bootstrapPage(
         div(class="span7",
             uiOutput("days")
         )
+    ),
+    div(class="row",
+        div(class="span7",
+            uiOutput("types")
+        )
     )
     
 ))
