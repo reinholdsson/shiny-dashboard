@@ -6,7 +6,7 @@ shinyUI(bootstrapPage(
     # Add custom CSS
     tagList(
         tags$head(
-            tags$title("Produktionsstatistik"),
+            tags$title("rHighcharts Dashboard Example"),
             tags$link(rel="stylesheet", type="text/css",
                       href="style.css")
         )
@@ -15,34 +15,35 @@ shinyUI(bootstrapPage(
     # Header panel
     div(class="row",
         div(class="span2",
-            uiOutput("year")
+            selectInput("year", label = "År", choices = .years, selected = max(.years))
         ),
         div(class="span2",
-            uiOutput("process")
+            selectInput("process", label = "Process", choices = .processes)
         )
     ),
     
-    # Main panel
-    #h3(textOutput("title")),
-    div(class="row",
-        div(class="span6",
-            uiOutput("flow")
+    conditionalPanel(
+        condition = "input.process",
+        # Main panel
+        #h3(textOutput("title")),
+        div(class="row",
+            div(class="span6",
+                chartOutput("flow")
+            ),
+            div(class="span6",
+                chartOutput("days")
+            )
         ),
-        div(class="span6",
-            uiOutput("days")
-        )
-    ),
-    div(class="row",
-        div(class="span6",
-            uiOutput("types")
-        ),
-        div(class="span6",
-            h4("Sammanfattning"),
-            textOutput("text"),
-            br(),
-            strong(textOutput("text2")),
-            htmlOutput("summary")
+        div(class="row",
+            div(class="span6",
+                chartOutput("types")
+            ),
+            div(class="span6",
+                textOutput("text"),
+                br(),
+                strong(textOutput("text2")),
+                htmlOutput("summary")
+            )
         )
     )
-    
 ))

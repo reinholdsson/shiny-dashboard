@@ -1,5 +1,4 @@
 # Load libraries
-
 library(zoo)
 library(lubridate)
 library(Coldbir)
@@ -23,3 +22,5 @@ library(googleVis)
 
 ## Constants
 .months <- c("Jan", "Feb", "Mar", "Apr", "Maj", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec")
+.processes <- sort(unique(.data$process), na.last = TRUE)
+.years <- sort(unique(c(year(.data$startdatum), year(.data$slutdatum))))

@@ -13,18 +13,7 @@ shinyServer(function(input, output) {
     output$text2 <- renderText({
         paste("Nyckeltal", input$year)
     })
-    
-    # UI controls    
-    output$process <- renderUI({
-        processes <- sort(unique(.data$process), na.last = TRUE)
-        selectInput("process", label = "Process", choices = processes)
-    })
-    
-    output$year <- renderUI({
-        years <- sort(unique(c(year(.data$startdatum), year(.data$slutdatum))))  # borttaget: na.last = TRUE
-        selectInput("year", label = "År", choices = years, selected = max(years))
-    })
-    
+
     # Data
     data <- reactive({
         .data[
@@ -166,14 +155,14 @@ shinyServer(function(input, output) {
     output$summary <- renderGvis({
         
         data <- data()[year(slutdatum) == input$year]
+        days <- data$slutdatum - data$startdatum
 
         stats <- c(
-            "Antal beslut" = nrow(data),
-            "Handläggningstid, genomsnitt, dagar" = round(mean(data$slutdatum - data$startdatum)),
+            "Avslutade ärenden, antal" = nrow(data),
+            "Inkomna ärenden, antal" = nrow(data()[year(startdatum) == input$year]),
             "Pågående ärenden, antal vid årets slut" = nrow(data()[year(startdatum) <= input$year & (is.na(slutdatum) | year(slutdatum) > input$year)]),
-            "Utbetalningsprecision, %" = NA,
-            "Andel materiellt riktiga beslut, %" = NA,
-            "Andel formellt riktiga beslut, %" = NA
+            "Handläggningstid, genomsnitt, dagar" = round(mean(days)),
+            "Handläggningstid, median, dagar" = round(median(days))
             )
         x <- data.frame("Mått" = names(stats), "Värde" = stats)
         gvisTable(x, options = list(width = "400px", page = "enable", height = "200px"), chartid = "ryc")
