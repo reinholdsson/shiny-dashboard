@@ -1,8 +1,5 @@
 shinyUI(bootstrapPage(
-    
-    # Add javascript files for rHighcharts
-    chart_js(),
-    
+
     # Add custom CSS
     tagList(
         tags$head(
