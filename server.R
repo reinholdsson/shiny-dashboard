@@ -6,6 +6,14 @@ shinyServer(function(input, output) {
         paste(input$process, input$year, sep = ", ")
     })
     
+    output$text <- renderText({
+        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged."
+    })
+    
+    output$text2 <- renderText({
+        paste("Nyckeltal", input$year)
+    })
+    
     # UI controls    
     output$process <- renderUI({
         processes <- sort(unique(.data$process), na.last = TRUE)
@@ -153,6 +161,23 @@ shinyServer(function(input, output) {
         a$subtitle(text = "Avslutade ärenden")
         a$data(x = data$arendetyp, y = data$N, type = "pie", name = "Antal", size = 150)
         return(a)
+    })
+    
+    output$summary <- renderGvis({
+        
+        data <- data()[year(slutdatum) == input$year]
+
+        stats <- c(
+            "Antal beslut" = nrow(data),
+            "Handläggningstid, genomsnitt, dagar" = round(mean(data$slutdatum - data$startdatum)),
+            "Pågående ärenden, antal vid årets slut" = nrow(data()[year(startdatum) <= input$year & (is.na(slutdatum) | year(slutdatum) > input$year)]),
+            "Utbetalningsprecision, %" = NA,
+            "Andel materiellt riktiga beslut, %" = NA,
+            "Andel formellt riktiga beslut, %" = NA
+            )
+        x <- data.frame("Mått" = names(stats), "Värde" = stats)
+        gvisTable(x, options = list(width = "400px", page = "enable", height = "200px"), chartid = "ryc")
+        
     })
     
 })

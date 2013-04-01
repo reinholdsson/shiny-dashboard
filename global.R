@@ -5,6 +5,7 @@ library(lubridate)
 library(Coldbir)
 library(rHighcharts)
 library(data.table)
+library(googleVis)
 
 # Global variables
 
@@ -21,5 +22,4 @@ library(data.table)
 )
 
 ## Constants
-#.months <- c("Januari", "Februari", "Mars", "April", "Maj", "Juni", "Juli", "Augusti", "September", "Oktober", "November", "December")
 .months <- c("Jan", "Feb", "Mar", "Apr", "Maj", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec")

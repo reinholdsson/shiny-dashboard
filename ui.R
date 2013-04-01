@@ -23,18 +23,25 @@ shinyUI(bootstrapPage(
     ),
     
     # Main panel
-    h3(textOutput("title")),
+    #h3(textOutput("title")),
     div(class="row",
-        div(class="span7",
+        div(class="span6",
             uiOutput("flow")
         ),
-        div(class="span7",
+        div(class="span6",
             uiOutput("days")
         )
     ),
     div(class="row",
-        div(class="span7",
+        div(class="span6",
             uiOutput("types")
+        ),
+        div(class="span6",
+            h4("Sammanfattning"),
+            textOutput("text"),
+            br(),
+            strong(textOutput("text2")),
+            htmlOutput("summary")
         )
     )
     
