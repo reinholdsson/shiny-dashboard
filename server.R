@@ -1,3 +1,5 @@
+library(hwriter)
+
 # Server application
 shinyServer(function(input, output) {
     
@@ -11,7 +13,7 @@ shinyServer(function(input, output) {
     })
     
     output$text2 <- renderText({
-        paste("Nyckeltal", input$year)
+        paste("Key indicators", input$year)
     })
 
     # Data
@@ -48,17 +50,17 @@ shinyServer(function(input, output) {
         
         # Skapa graf
         a <- rHighcharts:::Chart$new()
-        a$title(text = "In- och utflöde")
-        a$subtitle(text = "Inkomna och avslutade ärenden")
+        a$title(text = "In- och outflow")
+        a$subtitle(text = "Started and ended cases")
         a$xAxis(categories = data$month)
-        a$yAxis(title = list(text = "Antal ärenden"))
+        a$yAxis(title = list(text = "Number of cases"))
         
-        a$data(x = data$month, y = data$N.ongoing, type = "column", name = "Pågående")
-        a$data(x = data$month, y = data$N.started, type = "column", name = "Inkomna")
-        a$data(x = data$month, y = data$N.ended, type = "column", name = "Avslutade")
+        a$data(x = data$month, y = data$N.ongoing, type = "column", name = "Ongoing")
+        a$data(x = data$month, y = data$N.started, type = "column", name = "Started")
+        a$data(x = data$month, y = data$N.ended, type = "column", name = "Ended")
         a$data(x = data$month, y = data$N.change, type = "line", name = "+/-")
-        a$data(x = data$month, y = data$N.started_sum, type = "line", name = "Inkomna (aggregerat)")
-        a$data(x = data$month, y = data$N.ended_sum, type = "line", name = "Avslutade (aggregerat)")
+        #a$data(x = data$month, y = data$N.started_sum, type = "line", name = "Inkomna (aggregerat)")
+        #a$data(x = data$month, y = data$N.ended_sum, type = "line", name = "Avslutade (aggregerat)")
 
         return(a)
     })
@@ -126,14 +128,14 @@ shinyServer(function(input, output) {
 
         # Skapa graf
         a <- rHighcharts:::Chart$new()
-        a$title(text = "Handläggningstid")
-        a$subtitle(text = "Pågående och avslutade ärenden")
+        a$title(text = "Processing time")
+        a$subtitle(text = "Ongoing and ended cases")
         a$xAxis(categories = times$month)
-        a$yAxis(title = list(text = "Dagar"))
+        a$yAxis(title = list(text = "Days"))
 
-        a$data(x = times$month, y = as.double(times$mean), type = "column", name = "Avslutade")
-        a$data(x = times$month, y = times$mean_sum, type = "line", name = "Avslutade (aggregerat)")
-        a$data(x = times$month, y = times$V1.ongoing, type = "line", name = "Pågående")
+        a$data(x = times$month, y = as.double(times$mean), type = "column", name = "Ended")
+        a$data(x = times$month, y = times$mean_sum, type = "line", name = "Ended (aggregated)")
+        a$data(x = times$month, y = times$V1.ongoing, type = "line", name = "Ongoing")
 
         return(a)
     })
@@ -146,26 +148,27 @@ shinyServer(function(input, output) {
         
         # Skapa graf
         a <- rHighcharts:::Chart$new()
-        a$title(text = "Ärendetyp")
-        a$subtitle(text = "Avslutade ärenden")
-        a$data(x = data$arendetyp, y = data$N, type = "pie", name = "Antal", size = 150)
+        a$title(text = "Type of cases")
+        a$subtitle(text = "Ended cases")
+        a$data(x = data$arendetyp, y = data$N, type = "pie", name = "Amount", size = 150)
         return(a)
     })
     
-    output$summary <- renderGvis({
+    output$summary <- renderText({
         
         data <- data()[year(slutdatum) == input$year]
         days <- data$slutdatum - data$startdatum
 
         stats <- c(
-            "Avslutade ärenden, antal" = nrow(data),
-            "Inkomna ärenden, antal" = nrow(data()[year(startdatum) == input$year]),
-            "Pågående ärenden, antal vid årets slut" = nrow(data()[year(startdatum) <= input$year & (is.na(slutdatum) | year(slutdatum) > input$year)]),
-            "Handläggningstid, genomsnitt, dagar" = round(mean(days)),
-            "Handläggningstid, median, dagar" = round(median(days))
+            "Ended cases, amount" = nrow(data),
+            "Started cases, amount" = nrow(data()[year(startdatum) == input$year]),
+            "Ongoing cases, amount at 31/12" = nrow(data()[year(startdatum) <= input$year & (is.na(slutdatum) | year(slutdatum) > input$year)]),
+            "Processing time, mean days" = round(mean(days)),
+            "Processing turnover time, median days" = round(median(days))
             )
-        x <- data.frame("Mått" = names(stats), "Värde" = stats)
-        gvisTable(x, options = list(width = "400px", page = "enable", height = "200px"), chartid = "ryc")
+        x <- data.frame("Key" = names(stats), "Value" = stats)
+        hwrite(x, row.names=FALSE, col.names=FALSE, width = "75%")
+        #gvisTable(x, options = list(width = "400px", page = "enable", height = "200px"), chartid = "ryc")
         
     })
     

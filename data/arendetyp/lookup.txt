@@ -1,6 +1,6 @@
 key	value
-1	Ansökan
-2	Omprövning
-3	Omräkning
-4	Utbetalning
-5	Övrigt
+1	Application
+2	Review
+3	Re-calculation
+4	Payout
+5	Other

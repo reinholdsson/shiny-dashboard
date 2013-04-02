@@ -4,7 +4,7 @@ library(lubridate)
 library(Coldbir)
 library(rHighcharts)
 library(data.table)
-library(googleVis)
+library(hwriter)
 
 # Global variables
 
@@ -21,6 +21,6 @@ library(googleVis)
 )
 
 ## Constants
-.months <- c("Jan", "Feb", "Mar", "Apr", "Maj", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dec")
+.months <- c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
 .processes <- sort(unique(.data$process), na.last = TRUE)
 .years <- sort(unique(c(year(.data$startdatum), year(.data$slutdatum))))

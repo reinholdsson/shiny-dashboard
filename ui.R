@@ -1,5 +1,8 @@
 shinyUI(bootstrapPage(
-
+    
+    # Add javascript files for rHighcharts
+    chart_js(),
+    
     # Add custom CSS
     tagList(
         tags$head(
@@ -12,7 +15,7 @@ shinyUI(bootstrapPage(
     # Header panel
     div(class="row",
         div(class="span2",
-            selectInput("year", label = "År", choices = .years, selected = max(.years))
+            selectInput("year", label = "Year", choices = .years, selected = max(.years))
         ),
         div(class="span2",
             selectInput("process", label = "Process", choices = .processes)
@@ -25,15 +28,15 @@ shinyUI(bootstrapPage(
         #h3(textOutput("title")),
         div(class="row",
             div(class="span6",
-                chartOutput("flow")
+                htmlOutput("flow")
             ),
             div(class="span6",
-                chartOutput("days")
+                htmlOutput("days")
             )
         ),
         div(class="row",
             div(class="span6",
-                chartOutput("types")
+                htmlOutput("types")
             ),
             div(class="span6",
                 textOutput("text"),
