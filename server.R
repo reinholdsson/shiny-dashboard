@@ -1,5 +1,3 @@
-library(hwriter)
-
 # Server application
 shinyServer(function(input, output) {
     
@@ -59,9 +57,6 @@ shinyServer(function(input, output) {
         a$data(x = data$month, y = data$N.started, type = "column", name = "Started")
         a$data(x = data$month, y = data$N.ended, type = "column", name = "Ended")
         a$data(x = data$month, y = data$N.change, type = "line", name = "+/-")
-        #a$data(x = data$month, y = data$N.started_sum, type = "line", name = "Inkomna (aggregerat)")
-        #a$data(x = data$month, y = data$N.ended_sum, type = "line", name = "Avslutade (aggregerat)")
-
         return(a)
     })
     
@@ -168,8 +163,6 @@ shinyServer(function(input, output) {
             )
         x <- data.frame("Key" = names(stats), "Value" = stats)
         hwrite(x, row.names=FALSE, col.names=FALSE, width = "75%")
-        #gvisTable(x, options = list(width = "400px", page = "enable", height = "200px"), chartid = "ryc")
-        
     })
     
 })

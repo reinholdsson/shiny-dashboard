@@ -1,18 +1,14 @@
 shinyUI(bootstrapPage(
-    
-    # Add javascript files for rHighcharts
-    chart_js(),
-    
+
     # Add custom CSS
     tagList(
         tags$head(
-            tags$title("rHighcharts Dashboard Example"),
+            tags$title("Shiny Dashboard Example"),
             tags$link(rel="stylesheet", type="text/css",
                       href="style.css")
         )
     ),
     
-    # Header panel
     div(class="row",
         div(class="span2",
             selectInput("year", label = "Year", choices = .years, selected = max(.years))
@@ -22,21 +18,22 @@ shinyUI(bootstrapPage(
         )
     ),
     
+    HTML("<hr>"),
+    
     conditionalPanel(
         condition = "input.process",
-        # Main panel
-        #h3(textOutput("title")),
+        
         div(class="row",
             div(class="span6",
-                htmlOutput("flow")
+                chartOutput("flow")
             ),
             div(class="span6",
-                htmlOutput("days")
+                chartOutput("days")
             )
         ),
         div(class="row",
             div(class="span6",
-                htmlOutput("types")
+                chartOutput("types")
             ),
             div(class="span6",
                 textOutput("text"),
@@ -45,5 +42,9 @@ shinyUI(bootstrapPage(
                 htmlOutput("summary")
             )
         )
-    )
+    ),
+    
+    HTML("<hr>"),
+    HTML("Shiny Dashboard Example (<a href=\"https://github.com/reinholdsson/dashboard-app\">source code</a>) by Thomas Reinholdsson. For Highcharts in R, see <a href=\"https://github.com/metagraf/rHighcharts\">https://github.com/metagraf/rHighcharts</a>.")
+    
 ))
