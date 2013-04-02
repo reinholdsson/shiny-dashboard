@@ -45,6 +45,6 @@ shinyUI(bootstrapPage(
     ),
     
     HTML("<hr>"),
-    HTML("Shiny Dashboard Example (<a href=\"https://github.com/reinholdsson/dashboard-app\">source code</a>) by Thomas Reinholdsson. For Highcharts in R, see <a href=\"https://github.com/metagraf/rHighcharts\">https://github.com/metagraf/rHighcharts</a>.")
+    HTML("Shiny Dashboard Example (<a href=\"https://github.com/reinholdsson/shiny-dashboard\">source code</a>) by Thomas Reinholdsson. For Highcharts in R, see <a href=\"https://github.com/metagraf/rHighcharts\">https://github.com/metagraf/rHighcharts</a>.")
     
 ))
