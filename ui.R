@@ -25,7 +25,7 @@ shinyUI(bootstrapPage(
         
         div(class="row",
             div(class="span6",
-                chartOutput("flow")
+                showOutput("flow")
             ),
             div(class="span6",
                 chartOutput("days")

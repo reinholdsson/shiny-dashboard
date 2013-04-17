@@ -22,7 +22,7 @@ shinyServer(function(input, output) {
     })
     
     # Charts
-    output$flow <- renderChart({
+    output$flow <- rNVD3:::renderChart({
         
         # Load data
         data <- data()
@@ -40,27 +40,36 @@ shinyServer(function(input, output) {
         
         # Cut data on the last year (move this?)
         data <- data[year == input$year]
-        data[ , N.started_sum := cumsum(N.started)]  # sum started
-        data[ , N.ended_sum := cumsum(N.ended)]  # sum ended
+        #data[ , N.started_sum := cumsum(N.started)]  # sum started
+        #data[ , N.ended_sum := cumsum(N.ended)]  # sum ended
 
         # Replace month with labels
         data[ , month := .months[data$month]]
+        #setnames(data, colnames(data), c("year", "month", "Started", "Ended", "+/-", "Ongoing", "Started (aggr)", "Ended (aggr)"))
+        setnames(data, colnames(data), c("year", "month", "Started", "Ended", "+/-", "Ongoing"))
+        
+        data <- melt(data, id = c("year", "month"))
+        data <- data[data$variable != "+/-", ]
+        
+        a <- nvd3Plot(value ~ month | variable, data = data, width = NULL, height = NULL, type = 'multiBarChart', id = "flow")
+        
+        
         
         # Skapa graf
-        a <- rHighcharts:::Chart$new()
-        a$title(text = "In- och outflow")
-        a$subtitle(text = "Started and ended cases")
-        a$xAxis(categories = data$month)
-        a$yAxis(title = list(text = "Number of cases"))
-        
-        a$data(x = data$month, y = data$N.ongoing, type = "column", name = "Ongoing")
-        a$data(x = data$month, y = data$N.started, type = "column", name = "Started")
-        a$data(x = data$month, y = data$N.ended, type = "column", name = "Ended")
-        a$data(x = data$month, y = data$N.change, type = "line", name = "+/-")
+#         a <- rHighcharts:::Chart$new()
+#         a$title(text = "In- och outflow")
+#         a$subtitle(text = "Started and ended cases")
+#         a$xAxis(categories = data$month)
+#         a$yAxis(title = list(text = "Number of cases"))
+#         
+#         a$data(x = data$month, y = data$N.ongoing, type = "column", name = "Ongoing")
+#         a$data(x = data$month, y = data$N.started, type = "column", name = "Started")
+#         a$data(x = data$month, y = data$N.ended, type = "column", name = "Ended")
+#         a$data(x = data$month, y = data$N.change, type = "line", name = "+/-")
         return(a)
     })
     
-    output$days <- renderChart({
+    output$days <- rNVD3:::renderChart({
         
         # Ladda data
         data <- data()
@@ -120,22 +129,26 @@ shinyServer(function(input, output) {
             
         # Replace month with labels
         times$month <- .months[times$month]
-
+        #browser()
+        times <- melt(times, id = c("month", "year.ended", "N", "N_sum", "V1_sum", "year.ongoing"))
+        #browser()
+        a <- nvd3Plot(value ~ month | variable, data = times, width = NULL, height = NULL, type = 'multiBarChart', id = "days")
+        
         # Skapa graf
-        a <- rHighcharts:::Chart$new()
-        a$title(text = "Processing time")
-        a$subtitle(text = "Ongoing and ended cases")
-        a$xAxis(categories = times$month)
-        a$yAxis(title = list(text = "Days"))
-
-        a$data(x = times$month, y = as.double(times$mean), type = "column", name = "Ended")
-        a$data(x = times$month, y = times$mean_sum, type = "line", name = "Ended (aggregated)")
-        a$data(x = times$month, y = times$V1.ongoing, type = "line", name = "Ongoing")
+#         a <- rHighcharts:::Chart$new()
+#         a$title(text = "Processing time")
+#         a$subtitle(text = "Ongoing and ended cases")
+#         a$xAxis(categories = times$month)
+#         a$yAxis(title = list(text = "Days"))
+# 
+#         a$data(x = times$month, y = as.double(times$mean), type = "column", name = "Ended")
+#         a$data(x = times$month, y = times$mean_sum, type = "line", name = "Ended (aggregated)")
+#         a$data(x = times$month, y = times$V1.ongoing, type = "line", name = "Ongoing")
 
         return(a)
     })
     
-    output$types <- renderChart({
+    output$types <- rHighcharts:::renderChart({
         
         data <- data()[year(slutdatum) == input$year]
         data <- data[ , .N, by = arendetyp]

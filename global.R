@@ -5,6 +5,8 @@ library(Coldbir)
 library(rHighcharts)
 library(data.table)
 library(hwriter)
+library(rNVD3)
+library(reshape2)
 
 # Global variables
 
