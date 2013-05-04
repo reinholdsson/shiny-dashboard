@@ -1,3 +1,5 @@
+library(sparkle)
+
 shinyUI(bootstrapPage(
 
     # Add custom CSS
@@ -10,6 +12,20 @@ shinyUI(bootstrapPage(
     ),
     
     div(class="row",
+        div(class="span12",
+            h2("Shiny Dashboard Example")
+        )
+    ),
+    
+    div(class="row",
+        div(class="span5",
+            shareButtons(1)
+        )
+    ),
+    
+    HTML("<hr>"),
+    
+    div(class="row",
         div(class="span2",
             selectInput("year", label = "Year", choices = .years, selected = max(.years))
         ),
@@ -19,7 +35,7 @@ shinyUI(bootstrapPage(
     ),
     
     HTML("<hr>"),
-    
+
     conditionalPanel(
         condition = "input.process",
         
@@ -45,6 +61,7 @@ shinyUI(bootstrapPage(
     ),
     
     HTML("<hr>"),
-    HTML("Shiny Dashboard Example (<a href=\"https://github.com/reinholdsson/shiny-dashboard\">source code</a>) by Thomas Reinholdsson. For Highcharts in R, see <a href=\"https://github.com/metagraf/rHighcharts\">https://github.com/metagraf/rHighcharts</a>.")
+    HTML("Shiny Dashboard Example (<a href=\"https://github.com/reinholdsson/shiny-dashboard\">source code</a>) by Thomas Reinholdsson. For Highcharts in R, see <a href=\"https://github.com/metagraf/rHighcharts\">https://github.com/metagraf/rHighcharts</a>.<br><br>"),
+    followButtons(linkedin = "thomasreinholdsson", twitter = "thorei")
     
 ))
